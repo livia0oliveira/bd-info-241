@@ -69,7 +69,6 @@ def excluir_aluno(id: int):
     row_count = cursor.fetchone()[0]
 
     # Resetar a sequência do ID caso não exista nenhum aluno no banco de dados
-    # Para evitar a gambiarra do Arthur de colocar o ID junto com atualizar_aluno por causa disso
     if row_count == 0:
         cursor.execute('''
             DELETE FROM sqlite_sequence
