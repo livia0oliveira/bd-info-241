@@ -33,7 +33,7 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Professor (
 );""")
 
 mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Matricula (
-  id INT AUTO_INCREMENT NOT NULL,
+  id INT AUTO_INCREMENT,
   aluno_id INT,
   disciplina_id INT,
   professor_id INT,
@@ -49,22 +49,23 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Matricula (
   FOREIGN KEY (professor_id) REFERENCES TB_Professor(id)
 );""")
 
-mycursor.executemany("INSERT INTO TB_Aluno (id, nome) VALUES (%s, %s);",[
-    (1, "Ana Livia"), (2, "Jose Maia"), (3, "Marina")
+
+mycursor.executemany("INSERT INTO TB_Aluno (id, nome) VALUES (%s, %s) ON DUPLICATE KEY UPDATE nome = VALUES(nome);",[
+    (1, "Ana Livia"), (4, "Jose Maia"), (7, "Marina")
 ])
 
 mycursor.executemany("INSERT INTO TB_Professor (id, nome) VALUES (%s, %s);",[
-    (2, "Ana Olivia"), (4, "Joseph Maia"), (6, "Marine")
+    (2, "Ana Olivia"), (5, "Joseph Maia"), (8, "Marine")
 ])
 
-mycursor.executemany("INSERT INTO TB_Disciplina (nome) VALUES (%s, %s);",[
-    (7, "Artes visuais"), (8, "Introduçao a programaçao"), (9, "Portugues")
+mycursor.executemany("INSERT INTO TB_Disciplina (id, nome) VALUES (%s, %s);",[
+    (3, "Artes visuais"), (6, "Introduçao a programaçao"), (9, "Portugues")
 ])
 
 mycursor.executemany("INSERT INTO TB_Matricula (aluno_id, disciplina_id, professor_id, nota_n1, nota_n2, faltas) VALUES (%s,%s,%s,%s,%s,%s);",[
-    (1, 7, 2, 10, 9, 0),
-    (2, 8, 4, 6, 10, 40),
-    (3, 9, 6, 9, 4, 4)
+    (1, 3, 2, 10, 9, 0),
+    (4, 6, 5, 6, 10, 40),
+    (7, 9, 8, 9, 4, 4)
 ])
 
 mydb.commit()
@@ -73,9 +74,10 @@ mycursor.execute("SELECT * FROM TB_Matricula")
 resultado = mycursor.fetchall()
 
 for item in resultado:
-    aluno_id, disciplina_id, professor_id, nota_n1, nota_n2, faltas = item
+    id, aluno_id, disciplina_id, professor_id, nota_n1, nota_n2, faltas, media, aprovado_sn = item
+    print(item)
     
-    media = (2*nota_n1 + 3*nota_n2)/5
+    media = (2 * nota_n1 + 3 * nota_n2 )/ 5
     
     if media < 6 or faltas >= 20:
         aprovado_sn = False
