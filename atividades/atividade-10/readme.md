@@ -1,99 +1,218 @@
-# Codigo que ta certo mas ta dando erro :)
-docker-python.py
+# Atividade 10
+
+Crie um Banco de Dados envolvendo quatro tabelas. Uma tabela é um Cadastro (por exemplo TB_ALUNO), uma outra tabela é cadastro (por exemplo TB_DISCIPLINA) e uma outra também é cadastro (por TB_PROFESSOR). A quarta tabela Matricula se relaciona com as tabelas Aluno, Professor e Disciplina. Na tabela Matricula existirão chaves estrangeiras para Aluno, Professor e Disciplina. na tabela Matricula existirão atributos com as notas N1, N2 e Faltas. Criar instruções SQL com CRUD para as 4 tabelas. Implementar um código Python para ler a tabela Matricula e listar o status de aprovação dos alunos Matriculados.
+
+# Resolução usando o Play With Docker
+
+## Primeiros passos
+
+Utilize o comando a seguir para logar no docker evitando limite de pulls
+
+```
+docker login
+
+```
+
+Instale o mysql connector
+
+```
+
+pip install mysql-connector-python
+
+```
+
+## Crie o arquivo .yml com o comando 'vi' para abrir as portas e utilizar o MyPHP Admin
+
+```
+
+vi docker-compose.yml
+
+```
+
+Coloque alterando os dados necessários:
+
+``` yaml
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydbjosemaia
+      MYSQL_USER: myjosemaia
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+
+
+```
+
+
+## Criação do arquivo em python
+
+Utilize o comando 'vi' para criar
+
+```
+
+vi main.py
+
+```
+
+Coloque alterando os dados necessários:
+
+
 ```python
+
 import mysql.connector
 
 mydb = mysql.connector.connect(
     host="localhost",
-    user="myanalivia",
-    password="mypassword",
-    database="mydatabase"
+    user="myjosemaia",  
+    password="mypassword",  
+    database="mydbjosemaia"
 )
-mycursor = mydb.cursor()
 
-mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Aluno (
-    id INT AUTO_INCREMENT NOT NULL,
-    nome VARCHAR(50),
-    
-    PRIMARY KEY (id)
-);""")
-
-mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Disciplina (
-    id INT AUTO_INCREMENT NOT NULL,
-    nome VARCHAR(50),
-    
-    PRIMARY KEY (id)
-);""")
-
-mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Professor (
-    id INT AUTO_INCREMENT NOT NULL,
-    nome VARCHAR(50),
-    
-    PRIMARY KEY (id)
-);""")
-
-mycursor.execute("""CREATE TABLE IF NOT EXISTS TB_Matricula (
-  id INT AUTO_INCREMENT,
-  aluno_id INT,
-  disciplina_id INT,
-  professor_id INT,
-  nota_n1 DECIMAL (4,2),
-  nota_n2 DECIMAL (4,2),
-  media DECIMAL (4,2),
-  faltas INT,
-  aprovado_sn BOOLEAN,
-  
-  PRIMARY KEY (id),
-  FOREIGN KEY (aluno_id) REFERENCES TB_Aluno(id),
-  FOREIGN KEY (disciplina_id) REFERENCES TB_Disciplina(id),
-  FOREIGN KEY (professor_id) REFERENCES TB_Professor(id)
-);""")
+cursor = mydb.cursor()
 
 
-mycursor.executemany("INSERT INTO TB_Aluno (id, nome) VALUES (%s, %s) ON DUPLICATE KEY UPDATE nome = VALUES(nome);",[
-    (1, "Ana Livia"), (4, "Jose Maia"), (7, "Marina")
-])
 
-mycursor.executemany("INSERT INTO TB_Professor (id, nome) VALUES (%s, %s);",[
-    (2, "Ana Olivia"), (5, "Joseph Maia"), (8, "Marine")
-])
-
-mycursor.executemany("INSERT INTO TB_Disciplina (id, nome) VALUES (%s, %s);",[
-    (3, "Artes visuais"), (6, "Introduçao a programaçao"), (9, "Portugues")
-])
-
-mycursor.executemany("INSERT INTO TB_Matricula (aluno_id, disciplina_id, professor_id, nota_n1, nota_n2, faltas) VALUES (%s,%s,%s,%s,%s,%s);",[
-    (1, 3, 2, 10, 9, 0),
-    (4, 6, 5, 6, 10, 40),
-    (7, 9, 8, 9, 4, 4)
-])
-
-mydb.commit()
-
-mycursor.execute("SELECT * FROM TB_Matricula")
-resultado = mycursor.fetchall()
-
-for item in resultado:
-    id, aluno_id, disciplina_id, professor_id, nota_n1, nota_n2, faltas, media, aprovado_sn = item
-    print(item)
-    
-    media = (2 * nota_n1 + 3 * nota_n2 )/ 5
-    
-    if media < 6 or faltas >= 20:
-        aprovado_sn = False
-    else:
-        aprovado_sn = True
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS TB_ALUNO (
+        id_aluno INT PRIMARY KEY AUTO_INCREMENT,
+        nome_aluno VARCHAR(255) NOT NULL
         
-    mycursor.execute("UPDATE TB_Matricula SET aprovado_sn = %s, media = %s, WHERE id= %s;", (aprovado_sn, media, id))
-    
+    );
+""")
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS TB_PROFESSOR (
+        id_professor INT PRIMARY KEY AUTO_INCREMENT,
+        nome_professor VARCHAR(255) NOT NULL
+        
+    );
+""")
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS TB_DISCIPLINA (
+        id_disciplina INT PRIMARY KEY AUTO_INCREMENT,
+        nome_disciplina VARCHAR(255) NOT NULL
+        
+    );
+""")
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS TB_MATRICULA (
+        id_matricula INT PRIMARY KEY AUTO_INCREMENT,
+        id_aluno INT,
+        id_professor INT,
+        id_disciplina INT,
+        nota_n1 DECIMAL(5, 2),
+        nota_n2 DECIMAL(5, 2),
+        faltas INT,
+        media DECIMAL(5, 2),
+        aprovado BOOLEAN,
+        FOREIGN KEY (id_aluno) REFERENCES TB_ALUNO(id_aluno),
+        FOREIGN KEY (id_professor) REFERENCES TB_PROFESSOR(id_professor),
+        FOREIGN KEY (id_disciplina) REFERENCES TB_DISCIPLINA(id_disciplina)
+    );
+""")
+
+
+cursor.execute("""
+    INSERT INTO TB_ALUNO (nome_aluno) 
+    VALUES ('José Maia'),
+           ('Ana Lívia'),
+           ('Harry Potter')
+    ON DUPLICATE KEY UPDATE nome_aluno=VALUES(nome_aluno);
+""")
+
+cursor.execute("""
+    INSERT INTO TB_PROFESSOR (nome_professor) 
+    VALUES ('Prof. Ana Olivia'),
+           ('Prof. Josemar'),
+           ('Prof. Severo')
+    ON DUPLICATE KEY UPDATE nome_professor=VALUES(nome_professor);
+""")
+
+cursor.execute("""
+    INSERT INTO TB_DISCIPLINA (nome_disciplina) 
+    VALUES ('Artes Visuais'),
+           ('História'),
+           ('Química')
+    ON DUPLICATE KEY UPDATE nome_disciplina=VALUES(nome_disciplina);
+""")
+
+cursor.execute("""
+    INSERT INTO TB_MATRICULA (id_aluno, id_professor, id_disciplina, nota_n1, nota_n2, faltas, media, aprovado) 
+    VALUES (1, 1, 1, 7.5, 8.0, 2, 0, false),
+           (2, 2, 2, 6.0, 4.5, 3, 0, false),
+           (3, 3, 3, 8.0, 6.0, 32, 0, false)
+    ON DUPLICATE KEY UPDATE nota_n1=VALUES(nota_n1), nota_n2=VALUES(nota_n2), faltas=VALUES(faltas);
+""")
+
 mydb.commit()
 
-mycursor.execute("SELECT * FROM TB_Matricula")
-resultado = mycursor.fetchall()
 
-for item in resultado:
-    print(item)
-    
-mycursor.close()
+cursor.execute("""
+    SELECT A.id_aluno, A.nome_aluno, M.nota_n1, M.nota_n2, M.faltas
+    FROM TB_MATRICULA M
+    JOIN TB_ALUNO A ON M.id_aluno = A.id_aluno;
+""")
+
+
+
+matriculas = cursor.fetchall()
+
+
+for matricula in matriculas:
+    id, nome_aluno, nota_n1, nota_n2, faltas = matricula
+    media = ((2 * nota_n1) + (3 * nota_n2)) / 5
+    if faltas > 20:
+        aprovado = False
+    elif media >= 6.0:
+        aprovado = True
+    else:
+        aprovado = False
+    cursor.execute('UPDATE TB_MATRICULA SET aprovado = %s, media = %s WHERE id_matricula = %s;', (aprovado, media, id))
+    print(f"Aluno: {nome_aluno}, Média: {media}, Aprovado: {aprovado}")
+
+mydb.commit()
+
+
+cursor.close()
 mydb.close()
+
+
+
+```
+
+## Rodando
+
+Utilize o comando python {nome do arquivo}.py
+
+```
+
+python main.py
+
 ```
