@@ -255,5 +255,7 @@ print("\n -- Quantidade de Alunos Aprovados:", cursor.fetchone()[0])
 cursor.close()
 mydb.close()
 ```
-
-## Executar o 
+## Executar o arquivo python
+```
+python arquivo-python.py
+```
