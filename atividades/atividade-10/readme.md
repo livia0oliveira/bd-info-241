@@ -41,8 +41,8 @@ services:
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydbjosemaia
-      MYSQL_USER: myjosemaia
+      MYSQL_DATABASE: mydbanalivia
+      MYSQL_USER: myanalivia
       MYSQL_PASSWORD: mypassword
     volumes:
       - mysql_data:/var/lib/mysql
@@ -88,9 +88,9 @@ import mysql.connector
 
 mydb = mysql.connector.connect(
     host="localhost",
-    user="myjosemaia",  
+    user="myanalivia",  
     password="mypassword",  
-    database="mydbjosemaia"
+    database="mydbanalivia"
 )
 
 cursor = mydb.cursor()
