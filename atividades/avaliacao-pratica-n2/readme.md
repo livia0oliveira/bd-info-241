@@ -15,6 +15,37 @@ pip install mysql-connector-python
 vim docker-compose.yml
 ```
 ```yaml
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydbanalivia
+      MYSQL_USER: myanalivia
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
 ```
 ```
 docker-compose up -d
@@ -30,9 +61,9 @@ import mysql.connector
 
 mydb = mysql.connector.connect(
     host="localhost",
-    user="myjosemaia",  
+    user="myanalivia",  
     password="mypassword",  
-    database="mydbjosemaia"
+    database="mydbanalivia"
 )
 
 cursor = mydb.cursor()
