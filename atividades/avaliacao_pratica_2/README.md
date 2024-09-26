@@ -213,8 +213,8 @@ cursor.execute("""
 """)
 print("-- Quantidade de Alunos Reprovados:", cursor.fetchone()[0])
 print("")
-print("Nome | Matéria | Professor | Nota N1 | Nota N2 | Media Final | Faltas | Status")
 print("\nAlunos Aprovados:")
+print("Nome | Matéria | Professor | Nota N1 | Nota N2 | Media Final | Faltas | Status")
 cursor.execute("""
     SELECT 
         A.nome_aluno AS 'Nome do Aluno',
