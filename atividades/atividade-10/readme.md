@@ -213,6 +213,6 @@ Utilize o comando python {nome do arquivo}.py
 
 ```
 
-python main.py
+python arquivo-python.py
 
 ```
